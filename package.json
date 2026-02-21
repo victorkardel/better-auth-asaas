@@ -1,0 +1,62 @@
+{
+  "name": "better-auth-asaas",
+  "version": "0.1.0",
+  "description": "Better Auth plugin for Asaas payment gateway integration",
+  "author": "Victor Kardel",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/victorkardel/better-auth-asaas.git"
+  },
+  "homepage": "https://github.com/victorkardel/better-auth-asaas#readme",
+  "bugs": {
+    "url": "https://github.com/victorkardel/better-auth-asaas/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./client": {
+      "import": "./dist/client.js",
+      "types": "./dist/client.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:integration": "INTEGRATION=true vitest run",
+    "dev:cleanup": "tsx scripts/cleanup-sandbox.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "better-auth",
+    "asaas",
+    "payment",
+    "plugin",
+    "brazil"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "better-auth": ">=1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "better-auth": "^1.0.0",
+    "dotenv": "^16.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^3.0.0"
+  }
+}
