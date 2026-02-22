@@ -54,6 +54,14 @@ export const asaasSchema = {
         type: "string" as const,
         required: false,
       },
+      createdAt: {
+        type: "date" as const,
+        required: true,
+      },
+      updatedAt: {
+        type: "date" as const,
+        required: true,
+      },
     },
   },
   asaasPayment: {
@@ -108,6 +116,14 @@ export const asaasSchema = {
         type: "string" as const,
         required: false,
       },
+      createdAt: {
+        type: "date" as const,
+        required: true,
+      },
+      updatedAt: {
+        type: "date" as const,
+        required: true,
+      },
     },
   },
 } as const;
@@ -123,6 +139,8 @@ export type AsaasSubscriptionRecord = {
   description?: string;
   externalReference?: string;
   trialEndsAt?: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type AsaasPaymentRecord = {
@@ -138,4 +156,6 @@ export type AsaasPaymentRecord = {
   bankSlipUrl?: string;
   pixQrCodeId?: string;
   externalReference?: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
