@@ -1,6 +1,6 @@
 {
   "name": "better-auth-asaas",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Better Auth plugin for Asaas payment gateway integration",
   "author": "Victor Kardel",
   "repository": {
