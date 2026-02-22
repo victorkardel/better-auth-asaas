@@ -53,10 +53,82 @@ export const authClient = createAuthClient({
 
 ### Database migration
 
-Run Better Auth's migration to add the `asaasCustomerId` column to the `user` table and create the `asaasSubscription` table:
+Run Better Auth's migration to add the `asaasCustomerId` column to the `user` table and create the `asaasSubscription` and `asaasPayment` tables:
 
 ```bash
 npx better-auth migrate
+```
+
+#### Using Drizzle or Prisma?
+
+```bash
+# Prisma
+npx prisma migrate dev
+
+# Drizzle
+npx drizzle-kit push
+```
+
+#### Using ZenStack?
+
+The plugin is ORM-agnostic — it goes through Better Auth's adapter API, so it works with any ORM Better Auth supports. The only requirement is that the tables exist in your database.
+
+Add these models to your ZenStack schema file and run your migration:
+
+```prisma
+model User {
+  // ... your existing fields
+  asaasCustomerId      String?              @unique
+  asaasSubscriptions   AsaasSubscription[]
+  asaasPayments        AsaasPayment[]
+}
+
+model AsaasSubscription {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  asaasId           String   @unique
+  status            String
+  billingType       String
+  value             Float
+  nextDueDate       String
+  description       String?
+  externalReference String?
+  trialEndsAt       String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Restrict access to the owner — adjust policies to fit your app
+  @@allow('all', auth().id == userId)
+  @@map("asaasSubscription")
+}
+
+model AsaasPayment {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  asaasId           String   @unique
+  status            String
+  billingType       String
+  value             Float
+  dueDate           String
+  description       String?
+  invoiceUrl        String?
+  bankSlipUrl       String?
+  pixQrCodeId       String?
+  externalReference String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@allow('all', auth().id == userId)
+  @@map("asaasPayment")
+}
+```
+
+Then run your ZenStack/Prisma migration:
+
+```bash
+zenstack generate && npx prisma migrate dev
 ```
 
 ## Usage
