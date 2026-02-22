@@ -138,15 +138,19 @@ export class AsaasClient {
 
   private async request<T>(path: string, init: RequestInit = {}): Promise<T> {
     const url = `${this.baseUrl}${path}`;
-    const res = await fetch(url, {
-      ...init,
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": this.userAgent,
-        access_token: this.apiKey,
-        ...init.headers,
-      },
-    });
+
+    // Build headers explicitly to ensure access_token is always present.
+    // Spreading init.headers can silently drop it when headers is a Headers
+    // instance (common in SSR / server-function environments).
+    const headers = new Headers();
+    headers.set("Content-Type", "application/json");
+    headers.set("User-Agent", this.userAgent);
+    headers.set("access_token", this.apiKey);
+    if (init.headers) {
+      new Headers(init.headers as ConstructorParameters<typeof Headers>[0]).forEach((v, k) => headers.set(k, v));
+    }
+
+    const res = await fetch(url, { ...init, headers });
 
     if (!res.ok) {
       const body = await res.text();

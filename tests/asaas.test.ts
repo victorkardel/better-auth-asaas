@@ -45,14 +45,14 @@ describe("AsaasClient", () => {
     mockFetch.mockResolvedValueOnce(makeJsonResponse({ id: "cus_1" }));
     await client.getCustomer("cus_1");
     const [, init] = mockFetch.mock.calls[0] as [string, RequestInit];
-    expect((init.headers as Record<string, string>)["access_token"]).toBe("test-key");
+    expect((init.headers as Headers).get("access_token")).toBe("test-key");
   });
 
   it("sends User-Agent header (defaults to better-auth-asaas)", async () => {
     mockFetch.mockResolvedValueOnce(makeJsonResponse({ id: "cus_1" }));
     await client.getCustomer("cus_1");
     const [, init] = mockFetch.mock.calls[0] as [string, RequestInit];
-    expect((init.headers as Record<string, string>)["User-Agent"]).toBe("better-auth-asaas");
+    expect((init.headers as Headers).get("User-Agent")).toBe("better-auth-asaas");
   });
 
   it("sends custom User-Agent when provided", async () => {
@@ -60,7 +60,7 @@ describe("AsaasClient", () => {
     mockFetch.mockResolvedValueOnce(makeJsonResponse({ id: "cus_1" }));
     await customClient.getCustomer("cus_1");
     const [, init] = mockFetch.mock.calls[0] as [string, RequestInit];
-    expect((init.headers as Record<string, string>)["User-Agent"]).toBe("my-app");
+    expect((init.headers as Headers).get("User-Agent")).toBe("my-app");
   });
 
   it("createCustomer POSTs to /customers", async () => {
