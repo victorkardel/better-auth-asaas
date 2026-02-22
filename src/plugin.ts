@@ -35,7 +35,7 @@ export const asaas = (options: AsaasPluginOptions) => {
       asaasCreateCreditCardPayment: createCreditCardPaymentEndpoint(client),
       asaasListPayments: listPaymentsEndpoint(client),
       asaasDeletePayment: deletePaymentEndpoint(client),
-      asaasWebhook: webhookEndpoint(eventsConfig ?? {}, client),
+      asaasWebhook: webhookEndpoint(eventsConfig ?? {}, client, options.webhookSecret),
     },
     hooks: {
       after: [

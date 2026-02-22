@@ -7,11 +7,20 @@ import type {
 } from "../types.js";
 import type { AsaasClient } from "../asaas.js";
 
-export const webhookEndpoint = (handlers: AsaasEventHandlers = {}, asaas?: AsaasClient) =>
+export const webhookEndpoint = (handlers: AsaasEventHandlers = {}, asaas?: AsaasClient, webhookSecret?: string) =>
   createAuthEndpoint(
     "/asaas/webhook",
     { method: "POST" },
     async (ctx) => {
+      // Validate asaas-access-token header if a secret is configured
+      if (webhookSecret) {
+        const token = (ctx.request?.headers as Headers | undefined)?.get("asaas-access-token")
+          ?? (ctx.headers as Record<string, string> | undefined)?.["asaas-access-token"];
+        if (!token || token !== webhookSecret) {
+          return ctx.json({ error: "Unauthorized" }, { status: 401 });
+        }
+      }
+
       const body = ctx.body as AsaasEventPayload;
       const { event, payment, subscription } = body;
 

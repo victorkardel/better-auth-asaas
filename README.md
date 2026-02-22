@@ -195,6 +195,17 @@ Go to **Asaas → Configurações → Notificações → Webhooks** and add:
 https://your-app.com/api/auth/asaas/webhook
 ```
 
+Also set a **Token de autenticação** — Asaas will send it as the `asaas-access-token` header on every request. Pass it to the plugin as `webhookSecret` and the plugin will automatically reject any request that doesn't match:
+
+```ts
+asaas({
+  apiKey: process.env.ASAAS_API_KEY!,
+  webhookSecret: process.env.ASAAS_WEBHOOK_SECRET!, // must match what you set in Asaas dashboard
+})
+```
+
+> ⚠️ Without a `webhookSecret`, anyone who knows your webhook URL can send fake events. Always set this in production.
+
 > For local development use a tunnel like [ngrok](https://ngrok.com/) or [localtunnel](https://theboroer.github.io/localtunnel-www/):
 > ```bash
 > ngrok http 3000
@@ -320,6 +331,7 @@ export const auth = betterAuth({
 | `userAgent` | `string` | | Value sent as `User-Agent` header (default: `"better-auth-asaas"`). Mandatory for Asaas accounts created after 06/11/2024. |
 | `disableAutoCreateCustomer` | `boolean` | | Skip auto-creating customer on sign-up |
 | `onCustomerCreated` | `(customerId, userId) => void` | | Callback after customer is created |
+| `webhookSecret` | `string` | | Token set in Asaas dashboard (Token de autenticação). Plugin validates the `asaas-access-token` header and rejects unmatched requests with 401. |
 | `events` | `AsaasEventHandlers` | | Billing event handlers — see [Billing event handlers](#billing-event-handlers) |
 | `events.disableAsaasNotifications` | `boolean` | | Disable ALL Asaas-side notifications — Email, SMS, WhatsApp, Voice, Correios (default: `true`) |
 

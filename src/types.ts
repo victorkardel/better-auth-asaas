@@ -161,6 +161,14 @@ export interface AsaasPluginOptions extends AsaasClientOptions {
   disableAutoCreateCustomer?: boolean;
 
   /**
+   * If set, every incoming webhook request must include the header
+   * `asaas-access-token: <webhookSecret>`. Requests that don't match
+   * are rejected with 401. Set the same value in your Asaas dashboard
+   * under Configurações → Notificações → Webhooks → Token de autenticação.
+   */
+  webhookSecret?: string;
+
+  /**
    * Handlers for Asaas billing events routed through the webhook endpoint.
    *
    * When provided, **ALL** Asaas-side customer notifications are disabled by default —
