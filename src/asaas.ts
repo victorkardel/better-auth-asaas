@@ -25,6 +25,8 @@ export interface AsaasCustomer {
   postalCode?: string;
   externalReference?: string;
   notificationDisabled?: boolean;
+  /** Asaas customer group name — used to segment customers per tenant/site */
+  groupName?: string;
 }
 
 export type AsaasCustomerInput = Omit<AsaasCustomer, "id">;
@@ -207,7 +209,7 @@ export class AsaasClient {
     return this.request(`/subscriptions/${subscriptionId}/payments${query ? `?${query}` : ""}`);
   }
 
-  listCustomers(params?: { limit?: number; offset?: number; name?: string; email?: string }): Promise<{
+  listCustomers(params?: { limit?: number; offset?: number; name?: string; email?: string; externalReference?: string }): Promise<{
     object: "list";
     hasMore: boolean;
     totalCount: number;
@@ -220,6 +222,7 @@ export class AsaasClient {
     if (params?.offset != null) qs.set("offset", String(params.offset));
     if (params?.name) qs.set("name", params.name);
     if (params?.email) qs.set("email", params.email);
+    if (params?.externalReference) qs.set("externalReference", params.externalReference);
     const query = qs.toString();
     return this.request(`/customers${query ? `?${query}` : ""}`);
   }

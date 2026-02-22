@@ -34,6 +34,8 @@ export const auth = betterAuth({
     asaas({
       apiKey: process.env.ASAAS_API_KEY!,
       sandbox: process.env.NODE_ENV !== "production",
+      // Optional: group all customers under a named segment in Asaas
+      // customerGroupName: "my-saas-prod",
     }),
   ],
 });
@@ -332,6 +334,7 @@ export const auth = betterAuth({
 | `disableAutoCreateCustomer` | `boolean` | | Skip auto-creating customer on sign-up |
 | `onCustomerCreated` | `(customerId, userId) => void` | | Callback after customer is created |
 | `webhookSecret` | `string` | | Token set in Asaas dashboard (Token de autenticação). Plugin validates the `asaas-access-token` header and rejects unmatched requests with 401. |
+| `customerGroupName` | `string` | | Asaas group name assigned to every customer on creation. Useful for multi-tenancy — customers with the same email stay separated per tenant/site. Asaas creates the group automatically if it doesn't exist. |
 | `events` | `AsaasEventHandlers` | | Billing event handlers — see [Billing event handlers](#billing-event-handlers) |
 | `events.disableAsaasNotifications` | `boolean` | | Disable ALL Asaas-side notifications — Email, SMS, WhatsApp, Voice, Correios (default: `true`) |
 

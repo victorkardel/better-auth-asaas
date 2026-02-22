@@ -169,6 +169,17 @@ export interface AsaasPluginOptions extends AsaasClientOptions {
   webhookSecret?: string;
 
   /**
+   * Asaas customer group name to assign to every customer created by the plugin.
+   *
+   * Useful for multi-tenancy: each site/tenant gets its own group, so customers
+   * with the same email are cleanly separated in the Asaas dashboard.
+   * The group is created automatically by Asaas if it doesn't exist yet.
+   *
+   * Example: "my-saas-prod" or "tenant-acme"
+   */
+  customerGroupName?: string;
+
+  /**
    * Handlers for Asaas billing events routed through the webhook endpoint.
    *
    * When provided, **ALL** Asaas-side customer notifications are disabled by default —

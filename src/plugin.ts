@@ -51,22 +51,36 @@ export const asaas = (options: AsaasPluginOptions) => {
             if (!newUser) return;
 
             try {
-              const customer = await client.createCustomer({
-                name: newUser.name,
-                email: newUser.email,
-                externalReference: newUser.id,
-                // Disable ALL Asaas-side notifications (Email, SMS, WhatsApp, Voice robot, Correios)
-                // so the plugin routes events to your own handlers instead.
-                notificationDisabled: disableAsaasNotifications,
-              });
+              // Check if an Asaas customer already exists for this user ID (idempotency).
+              // This guards against double sign-up calls, retries, or re-seeds where the
+              // same Better Auth user ID appears again with no asaasCustomerId in the DB.
+              const existing = await client.listCustomers({ externalReference: newUser.id, limit: 1 });
+              let customerId: string;
+
+              if (existing.data.length > 0) {
+                // Reuse the existing Asaas customer — just sync the ID back to our DB
+                customerId = existing.data[0]!.id;
+              } else {
+                const customer = await client.createCustomer({
+                  name: newUser.name,
+                  email: newUser.email,
+                  externalReference: newUser.id,
+                  // Group enables multi-tenancy: same email across different sites stays separated
+                  ...(options.customerGroupName ? { groupName: options.customerGroupName } : {}),
+                  // Disable ALL Asaas-side notifications (Email, SMS, WhatsApp, Voice robot, Correios)
+                  // so the plugin routes events to your own handlers instead.
+                  notificationDisabled: disableAsaasNotifications,
+                });
+                customerId = customer.id;
+              }
 
               await ctx.context.adapter.update({
                 model: "user",
                 where: [{ field: "id", value: newUser.id }],
-                update: { asaasCustomerId: customer.id },
+                update: { asaasCustomerId: customerId },
               });
 
-              await options.onCustomerCreated?.(customer.id, newUser.id);
+              await options.onCustomerCreated?.(customerId, newUser.id);
             } catch (err) {
               ctx.context.logger.error("Failed to create Asaas customer", err);
             }
