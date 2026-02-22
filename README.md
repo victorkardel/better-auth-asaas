@@ -179,7 +179,49 @@ await authClient.asaas.subscriptionCancel({
 
 ### Webhook
 
-Register `https://your-app.com/api/auth/asaas/webhook` as the webhook URL in your Asaas dashboard. The plugin will automatically keep subscription statuses in sync.
+The plugin registers a webhook endpoint at:
+
+```
+POST /api/auth/asaas/webhook
+```
+
+This is the URL Asaas will call to notify your app of billing events (payment confirmed, subscription canceled, etc.). You need to register it in your Asaas dashboard so events flow through.
+
+**Step 1 — Register in Asaas dashboard**
+
+Go to **Asaas → Configurações → Notificações → Webhooks** and add:
+
+```
+https://your-app.com/api/auth/asaas/webhook
+```
+
+> For local development use a tunnel like [ngrok](https://ngrok.com/) or [localtunnel](https://theboroer.github.io/localtunnel-www/):
+> ```bash
+> ngrok http 3000
+> # then register: https://abc123.ngrok.io/api/auth/asaas/webhook
+> ```
+
+**Step 2 — Make sure the route is publicly accessible**
+
+The webhook URL must be reachable by Asaas without authentication. Better Auth exposes all plugin endpoints under `/api/auth/...` — make sure your framework isn't adding auth middleware to that path.
+
+**Step 3 — Handle events via the `events` option**
+
+```ts
+asaas({
+  apiKey: process.env.ASAAS_API_KEY!,
+  events: {
+    onPaymentConfirmed: async ({ payment }) => {
+      // grant access, send receipt, etc.
+    },
+    onSubscriptionCanceled: async ({ subscription }) => {
+      // revoke access, trigger win-back email, etc.
+    },
+  },
+})
+```
+
+Without any `events` handlers the webhook still works — it silently keeps your local `asaasSubscription` and `asaasPayment` table statuses in sync with Asaas.
 
 ## Billing event handlers
 
